@@ -33,12 +33,20 @@ namespace LocalStorage.Service
             httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
+        /// <summary>
+        /// Get all todos
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public IList<TaskModel> GetItems(int userId)
         {
             var t = new Thread(() => GetServerItems(userId));
             return _repository.GetItems(userId);
         }
-        
+        /// <summary>
+        /// Get user from cookies if exists  else create new user instance
+        /// </summary>
+        /// <returns></returns>
         public int GetOrCreateUser()
         {
             var userCookie = HttpContext.Current.Request.Cookies["user"];
@@ -66,7 +74,10 @@ namespace LocalStorage.Service
             return 1;
             //return userid;
         }
-
+        /// <summary>
+        /// Update todo
+        /// </summary>
+        /// <param name="todo"></param>
         public void UpdateItem(TaskModel todo)
         {
             _repository.UpdateItem(todo);
@@ -75,13 +86,20 @@ namespace LocalStorage.Service
             var t = new Thread(() => SendPutMess(httpClient, todo));
             t.Start();
         }
-
+        /// <summary>
+        /// create todo
+        /// </summary>
+        /// <param name="todo"></param>
         public void CreateItem(TaskModel todo)
         {
             _repository.CreateItem(todo);
             var t = new Thread(() => SendPostMess(httpClient,todo));
             t.Start();
         }
+        /// <summary>
+        /// Delete todo
+        /// </summary>
+        /// <param name="id"></param>
         public void DeleteItem(int id)
         {
             var model = _repository.DeleteItem(id);
@@ -102,6 +120,10 @@ namespace LocalStorage.Service
         {
             httpClient.DeleteAsync(string.Format(serviceApiUrl + DeleteUrl, id)).Result.EnsureSuccessStatusCode();
         }
+        /// <summary>
+        /// Get all todos from server and save real todo id
+        /// </summary>
+        /// <param name="userId"></param>
         private void GetServerItems(int userId)
         {
             var dataAsString = httpClient.GetStringAsync(string.Format(serviceApiUrl + GetAllUrl, userId)).Result;

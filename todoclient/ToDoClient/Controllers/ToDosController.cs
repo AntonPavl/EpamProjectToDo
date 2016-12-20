@@ -1,4 +1,5 @@
 ﻿using LocalStorage.Context;
+using LocalStorage.Interfaces;
 using LocalStorage.Model;
 using LocalStorage.Service;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ namespace ToDoClient.Controllers
     /// </summary>
     public class ToDosController : ApiController
     {
-        private readonly DataService dataService = new DataService();
+        private readonly IDataService dataService = new DataService();
 
         /// <summary>
         /// Returns all todo-items for the current user.

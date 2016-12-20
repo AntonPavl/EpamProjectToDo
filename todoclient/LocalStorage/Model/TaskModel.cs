@@ -14,7 +14,7 @@ namespace LocalStorage.Model
         /// <value>
         /// To do identifier.
         /// </value>
-        public int Id { get; set; }
+        public int Id { get; set; }  //rename as ToDoId and Add [Key] it's repair Delete *atalog
         public int RealId { get; set; }
 
         /// <summary>

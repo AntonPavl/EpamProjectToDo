@@ -17,7 +17,11 @@ namespace LocalStorage.Repository
         public DataRepository()
         {
         }
-
+        /// <summary>
+        /// create user in repository
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public int CreateUser(int id)
         {
             using (var db = new DbContext())
@@ -29,6 +33,11 @@ namespace LocalStorage.Repository
             return 1;
             //return id;
         }
+        /// <summary>
+        /// Get all todos from repository
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public IList<TaskModel> GetItems(int userId)
         {
             using (var db = new DbContext())
@@ -37,6 +46,10 @@ namespace LocalStorage.Repository
                 return tasks.ToList() ;
             }
         }
+        /// <summary>
+        /// Update todo in repositry
+        /// </summary>
+        /// <param name="todo"></param>
         public void UpdateItem(TaskModel todo)
         {
             using (var db = new DbContext())
@@ -52,6 +65,11 @@ namespace LocalStorage.Repository
                 }
             }
         }
+        /// <summary>
+        /// create and save Todo
+        /// </summary>
+        /// <param name="todo"></param>
+        /// <returns></returns>
         public TaskModel CreateItem(TaskModel todo)
         {
             TaskModel ret;
@@ -66,12 +84,15 @@ namespace LocalStorage.Repository
                 };
                 f.TaskList.Add(model);
                 ret = model;
-                //db.Tasks.Add(todo);
                 db.SaveChanges();
             }
             return ret;
         }
-
+        /// <summary>
+        /// Delete todo
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public TaskModel DeleteItem(int id)
         {
             TaskModel ret;
@@ -82,7 +103,10 @@ namespace LocalStorage.Repository
             }
             return ret;
         }
-
+        /// <summary>
+        /// create a lot of items and save
+        /// </summary>
+        /// <param name="list"></param>
         public void CreateItems(IList<TaskModel> list)
         {
             if (list!= null)
