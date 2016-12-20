@@ -9,6 +9,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -33,8 +34,6 @@ namespace LocalStorage.Service
         public IList<TaskModel> GetItems(int userId)
         {
             return _repository.GetItems(userId);
-            //var dataAsString = httpClient.GetStringAsync(string.Format(serviceApiUrl + GetAllUrl, userId)).Result;
-            //var data = JsonConvert.DeserializeObject<IList<TaskModel>>(dataAsString);
         }
 
         public int GetOrCreateUser()
@@ -68,18 +67,34 @@ namespace LocalStorage.Service
         public void UpdateItem(TaskModel todo)
         {
             _repository.UpdateItem(todo);
-            httpClient.PutAsJsonAsync(serviceApiUrl + UpdateUrl, todo).Result.EnsureSuccessStatusCode();
+            var t = new Thread(() => SendPutMess(httpClient, todo));
+            t.Start();
         }
 
         public void CreateItem(TaskModel todo)
         {
             _repository.CreateItem(todo);
-            httpClient.PostAsJsonAsync(serviceApiUrl + CreateUrlTodo, todo.TaskModel_To_ToDoViewModel()).Result.EnsureSuccessStatusCode();
+            var t = new Thread(() => SendPostMess(httpClient,todo));
+            t.Start();
         }
-
         public void DeleteItem(int id)
         {
             _repository.DeleteItem(id);
+            var t = new Thread(() => SendDeleteMess(httpClient, id));
+            t.Start();
+        }
+
+
+        private static void SendPostMess(HttpClient httpClient, TaskModel todo)
+        {
+            httpClient.PostAsJsonAsync(serviceApiUrl + CreateUrlTodo, todo.TaskModel_To_ToDoViewModel()).Result.EnsureSuccessStatusCode();
+        }
+        private static void SendPutMess(HttpClient httpClient, TaskModel todo)
+        {
+            httpClient.PutAsJsonAsync(serviceApiUrl + UpdateUrl, todo.TaskModel_To_ToDoViewModel()).Result.EnsureSuccessStatusCode();
+        }
+        private static void SendDeleteMess(HttpClient httpClient, int id)
+        {
             httpClient.DeleteAsync(string.Format(serviceApiUrl + DeleteUrl, id)).Result.EnsureSuccessStatusCode();
         }
     }

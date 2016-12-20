@@ -47,7 +47,7 @@ namespace LocalStorage.Repository
 
                     item.IsCompleted = todo.IsCompleted;
                     item.Name = todo.Name;
-                    item.User = todo.User;
+                    item.User = db.Users.FirstOrDefault(x=>x.Id == todo.User.Id);
                     db.SaveChanges();
                 }
             }

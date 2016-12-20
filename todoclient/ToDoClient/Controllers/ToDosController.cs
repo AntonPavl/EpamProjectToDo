@@ -23,14 +23,13 @@ namespace ToDoClient.Controllers
         /// Returns all todo-items for the current user.
         /// </summary>
         /// <returns>The list of todo-items.</returns>
-        public IList<ToDoItemViewModel> Get()
+        public IList<ToDoItemViewModel> Get() //Work
         {
-            //var userId = userService.GetOrCreateUser();
-            //return todoService.GetItems(userId);
             var userId = dataService.GetOrCreateUser();
-            var list = dataService.GetItems(userId).Select(x => x.TaskModel_To_ToDoViewModel()).ToList();
-            return list;
+            return dataService.GetItems(userId).Select(x => x.TaskModel_To_ToDoViewModel()).ToList();
         }
+
+
 
         /// <summary>
         /// Updates the existing todo-item.
@@ -54,15 +53,15 @@ namespace ToDoClient.Controllers
             dataService.DeleteItem(id);
         }
 
+
+
         /// <summary>
         /// Creates a new todo-item.
         /// </summary>
         /// <param name="todo">The todo-item to create.</param>
-        public void Post(ToDoItemViewModel todo)
+        public void Post(ToDoItemViewModel todo) //Work
         {
-            //todo.UserId = userService.GetOrCreateUser(); // REPOSITORY.GetOrCreateUser();
-            //todoService.CreateItem(todo); //REPOSITORY.CreateItem();
-            todo.UserId = dataService.GetOrCreateUser(); // REPOSITORY.GetOrCreateUser();
+            todo.UserId = dataService.GetOrCreateUser();
             dataService.CreateItem(todo.ToDoViewModel_To_TaskModel());
         }
     }
