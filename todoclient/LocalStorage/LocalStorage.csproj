@@ -78,6 +78,8 @@
     <Compile Include="Context\DbContext.cs" />
     <Compile Include="Delete\Mapper.cs" />
     <Compile Include="Delete\ToDoItemViewModel.cs" />
+    <Compile Include="Interfaces\IDataRepository.cs" />
+    <Compile Include="Interfaces\IDataService.cs" />
     <Compile Include="Model\TaskModel.cs" />
     <Compile Include="Model\UserModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

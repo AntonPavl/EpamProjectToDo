@@ -6,7 +6,6 @@ using System.Linq;
 using System.Web.Http;
 using todoclient.Mappers;
 using ToDoClient.Models;
-using ToDoClient.Services;
 
 namespace ToDoClient.Controllers
 {
@@ -15,10 +14,8 @@ namespace ToDoClient.Controllers
     /// </summary>
     public class ToDosController : ApiController
     {
-        private readonly ToDoService todoService = new ToDoService();
-        private readonly UserService userService = new UserService();
         private readonly DataService dataService = new DataService();
-        //Anton!!
+
         /// <summary>
         /// Returns all todo-items for the current user.
         /// </summary>
@@ -30,15 +27,12 @@ namespace ToDoClient.Controllers
         }
 
 
-
         /// <summary>
         /// Updates the existing todo-item.
         /// </summary>
         /// <param name="todo">The todo-item to update.</param>
         public void Put(ToDoItemViewModel todo)
         {
-            //todo.UserId = userService.GetOrCreateUser(); 
-            //todoService.UpdateItem(todo); 
             todo.UserId = dataService.GetOrCreateUser();
             dataService.UpdateItem(todo.ToDoViewModel_To_TaskModel());
         }
@@ -49,7 +43,6 @@ namespace ToDoClient.Controllers
         /// <param name="id">The todo item identifier.</param>
         public void Delete(int id)
         {
-            // todoService.DeleteItem(id); 
             dataService.DeleteItem(id);
         }
 

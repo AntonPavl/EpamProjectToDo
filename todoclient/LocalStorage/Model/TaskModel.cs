@@ -15,7 +15,7 @@ namespace LocalStorage.Model
         /// To do identifier.
         /// </value>
         public int Id { get; set; }
-
+        public int RealId { get; set; }
 
         /// <summary>
         /// Gets or sets the user identifier.

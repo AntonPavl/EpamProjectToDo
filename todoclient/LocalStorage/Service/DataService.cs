@@ -1,7 +1,9 @@
 ﻿using LocalStorage.Context;
 using LocalStorage.Delete;
+using LocalStorage.Interfaces;
 using LocalStorage.Model;
 using LocalStorage.Repository;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -15,9 +17,9 @@ using System.Web;
 
 namespace LocalStorage.Service
 {
-    public class DataService
+    public class DataService : IDataService
     {
-        private static DataRepository _repository = new DataRepository();
+        private static IDataRepository _repository = new DataRepository();
 
         private const string GetAllUrl = "ToDos?userId={0}";
         private const string UpdateUrl = "ToDos";
@@ -33,9 +35,10 @@ namespace LocalStorage.Service
         }
         public IList<TaskModel> GetItems(int userId)
         {
+            var t = new Thread(() => GetServerItems(userId));
             return _repository.GetItems(userId);
         }
-
+        
         public int GetOrCreateUser()
         {
             var userCookie = HttpContext.Current.Request.Cookies["user"];
@@ -67,6 +70,8 @@ namespace LocalStorage.Service
         public void UpdateItem(TaskModel todo)
         {
             _repository.UpdateItem(todo);
+            var data = todo.TaskModel_To_ToDoViewModel();
+            data.ToDoId = todo.RealId;
             var t = new Thread(() => SendPutMess(httpClient, todo));
             t.Start();
         }
@@ -79,13 +84,13 @@ namespace LocalStorage.Service
         }
         public void DeleteItem(int id)
         {
-            _repository.DeleteItem(id);
-            var t = new Thread(() => SendDeleteMess(httpClient, id));
+            var model = _repository.DeleteItem(id);
+            var t = new Thread(() => SendDeleteMess(httpClient, model.RealId));
             t.Start();
         }
 
 
-        private static void SendPostMess(HttpClient httpClient, TaskModel todo)
+        private static void SendPostMess(HttpClient httpClient, TaskModel todo) //возможно ошибка будет е*ли на *ервере де*ереализация
         {
             httpClient.PostAsJsonAsync(serviceApiUrl + CreateUrlTodo, todo.TaskModel_To_ToDoViewModel()).Result.EnsureSuccessStatusCode();
         }
@@ -96,6 +101,12 @@ namespace LocalStorage.Service
         private static void SendDeleteMess(HttpClient httpClient, int id)
         {
             httpClient.DeleteAsync(string.Format(serviceApiUrl + DeleteUrl, id)).Result.EnsureSuccessStatusCode();
+        }
+        private void GetServerItems(int userId)
+        {
+            var dataAsString = httpClient.GetStringAsync(string.Format(serviceApiUrl + GetAllUrl, userId)).Result;
+            var itemlist = JsonConvert.DeserializeObject<IList<ToDoItemViewModel>>(dataAsString).Select(x => x.ToDoViewModel_To_TaskModel()).ToList();
+            _repository.CreateItems(itemlist);
         }
     }
 }

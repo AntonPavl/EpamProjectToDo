@@ -14,7 +14,7 @@ namespace ToDoClient.Models
         /// To do identifier.
         /// </value>
         public int ToDoId { get; set; }
-
+        public int RealId { get; set; }
 
         /// <summary>
         /// Gets or sets the user identifier.

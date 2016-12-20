@@ -7,10 +7,11 @@ using System.Configuration;
 using System.Linq;
 using System.Net.Http.Headers;
 using System;
+using LocalStorage.Interfaces;
 
 namespace LocalStorage.Repository
 {
-    public class DataRepository
+    public class DataRepository : IDataRepository
     {
         private List<UserModel> users = new List<UserModel>();
         public DataRepository()
@@ -32,7 +33,6 @@ namespace LocalStorage.Repository
         {
             using (var db = new DbContext())
             {
-                var user = db.Users.FirstOrDefault(x => x.Id == userId);
                 var tasks = db.Tasks.Where(x => x.User.Id == userId);
                 return tasks.ToList() ;
             }
@@ -52,8 +52,9 @@ namespace LocalStorage.Repository
                 }
             }
         }
-        public void CreateItem(TaskModel todo)
+        public TaskModel CreateItem(TaskModel todo)
         {
+            TaskModel ret;
             using (var db = new DbContext())
             {
                 var f = db.Users.FirstOrDefault(x => x.Id == todo.User.Id);
@@ -64,18 +65,52 @@ namespace LocalStorage.Repository
                     Name = todo.Name
                 };
                 f.TaskList.Add(model);
+                ret = model;
                 //db.Tasks.Add(todo);
                 db.SaveChanges();
             }
+            return ret;
         }
 
-        public void DeleteItem(int id)
+        public TaskModel DeleteItem(int id)
         {
+            TaskModel ret;
             using (var db = new DbContext())
             {
-                db.Tasks.Remove(db.Tasks.FirstOrDefault( x => x.Id == id));
+                ret = db.Tasks.Remove(db.Tasks.FirstOrDefault( x => x.Id == id));
+                db.SaveChanges();
             }
+            return ret;
         }
 
+        public void CreateItems(IList<TaskModel> list)
+        {
+            if (list!= null)
+            {
+                using (var db = new DbContext())
+                {
+                    var f = db.Users.FirstOrDefault(x => x.Id == list[0].User.Id);
+                    foreach (var item in list)
+                    {
+                        if (db.Tasks.Contains(item))
+                        {
+                            var task = db.Tasks.FirstOrDefault(x => x.Name == item.Name);
+                            task.RealId = item.RealId;
+                        }
+                        else
+                        {
+                            var model = new TaskModel()
+                            {
+                                RealId = item.Id,
+                                IsCompleted = item.IsCompleted,
+                                Name = item.Name
+                            };
+                            f.TaskList.Add(model);
+                        }
+                    }
+                    db.SaveChanges();
+                }
+            }
+        }
     }
 }
