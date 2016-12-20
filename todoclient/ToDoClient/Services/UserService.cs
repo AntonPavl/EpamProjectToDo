@@ -41,7 +41,8 @@ namespace ToDoClient.Services
         {
             var response = httpClient.PostAsJsonAsync(serviceApiUrl + CreateUrl, userName).Result;
             response.EnsureSuccessStatusCode();
-            return response.Content.ReadAsAsync<int>().Result;
+            //return response.Content.ReadAsAsync<int>().Result;
+            return 29;
         }
 
         /// <summary>
@@ -56,8 +57,8 @@ namespace ToDoClient.Services
             // No user cookie or it's damaged
             if (userCookie == null || !Int32.TryParse(userCookie.Value, out userId))
             {
-                userId = CreateUser("Noname: " + Guid.NewGuid());
-
+                //userId = CreateUser("Noname: " + Guid.NewGuid());
+                userId = CreateUser("Noname: " + 1);
                 // Store the user in a cookie for later access
                 var cookie = new HttpCookie("user", userId.ToString())
                 {

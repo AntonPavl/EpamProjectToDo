@@ -4,6 +4,9 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
 using ToDoClient.Models;
+using LocalStorage.Repository;
+using System.Linq;
+using todoclient.Mappers;
 
 namespace ToDoClient.Services
 {
@@ -12,6 +15,7 @@ namespace ToDoClient.Services
     /// </summary>
     public class ToDoService
     {
+        public DataRepository dr = new DataRepository();
         /// <summary>
         /// The service URL.
         /// </summary>
@@ -44,8 +48,8 @@ namespace ToDoClient.Services
         /// </summary>
         public ToDoService()
         {
-            httpClient = new HttpClient();
-            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            //httpClient = new HttpClient();
+            //httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
         /// <summary>
@@ -55,8 +59,8 @@ namespace ToDoClient.Services
         /// <returns>The list of todos.</returns>
         public IList<ToDoItemViewModel> GetItems(int userId)
         {
-            var dataAsString = httpClient.GetStringAsync(string.Format(serviceApiUrl + GetAllUrl, userId)).Result;
-            return JsonConvert.DeserializeObject<IList<ToDoItemViewModel>>(dataAsString);
+            var ret = dr.GetItems(userId);
+            return ret.Select(x => x.TaskModel_To_ToDoViewModel()).ToList();
         }
 
         /// <summary>
@@ -65,8 +69,9 @@ namespace ToDoClient.Services
         /// <param name="item">The todo to create.</param>
         public void CreateItem(ToDoItemViewModel item)
         {
-            httpClient.PostAsJsonAsync(serviceApiUrl + CreateUrl, item)
-                .Result.EnsureSuccessStatusCode();
+            dr.CreateItem(item.ToDoViewModel_To_TaskModel());
+            //httpClient.PostAsJsonAsync(serviceApiUrl + CreateUrl, item)
+                //.Result.EnsureSuccessStatusCode();
         }
 
         /// <summary>
@@ -75,8 +80,9 @@ namespace ToDoClient.Services
         /// <param name="item">The todo to update.</param>
         public void UpdateItem(ToDoItemViewModel item)
         {
-            httpClient.PutAsJsonAsync(serviceApiUrl + UpdateUrl, item)
-                .Result.EnsureSuccessStatusCode();
+            dr.UpdateItem(item.ToDoViewModel_To_TaskModel());
+           // httpClient.PutAsJsonAsync(serviceApiUrl + UpdateUrl, item)
+                //.Result.EnsureSuccessStatusCode();
         }
 
         /// <summary>
@@ -85,8 +91,9 @@ namespace ToDoClient.Services
         /// <param name="id">The todo Id to delete.</param>
         public void DeleteItem(int id)
         {
-            httpClient.DeleteAsync(string.Format(serviceApiUrl + DeleteUrl, id))
-                .Result.EnsureSuccessStatusCode();
+            dr.DeleteItem(id);
+            //httpClient.DeleteAsync(string.Format(serviceApiUrl + DeleteUrl, id))
+               // .Result.EnsureSuccessStatusCode();
         }
     }
 }
