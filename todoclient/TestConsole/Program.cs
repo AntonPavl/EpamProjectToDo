@@ -12,7 +12,7 @@ namespace TestConsole
     {
         static void Main(string[] args)
         {
-            using (var db = new DbContext())
+            using (var db = new ToDoContext())
             {
                 var user1 = new UserModel() {Id=29 };
                 db.Users.Add(user1);

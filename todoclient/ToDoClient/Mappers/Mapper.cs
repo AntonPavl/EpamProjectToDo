@@ -23,15 +23,16 @@ namespace todoclient.Mappers
 
         public static TaskModel ToDoViewModel_To_TaskModel(this ToDoItemViewModel tm)
         {
-            using (var db = new DbContext())
+            using (var db = new ToDoContext())
             {
-                return new TaskModel()
-                {
-                    IsCompleted = tm.IsCompleted,
-                    Name = tm.Name,
-                    Id = tm.ToDoId,
-                    User = db.Users.FirstOrDefault(x => x.Id == tm.UserId)
-                };
+                var model = new TaskModel();
+                model.IsCompleted = tm.IsCompleted;
+                model.Name = tm.Name;
+                model.Id = tm.ToDoId;
+                model.User = db.Users.FirstOrDefault(x => x.Id == tm.UserId);
+
+
+                return model;
             }
         }
     }

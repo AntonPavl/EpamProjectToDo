@@ -23,7 +23,7 @@ namespace LocalStorage.Delete
 
         public static TaskModel ToDoViewModel_To_TaskModel(this ToDoItemViewModel tm)
         {
-            using (var db = new DbContext())
+            using (var db = new ToDoContext())
             {
                 return new TaskModel()
                 {

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace LocalStorage.Model
+﻿namespace LocalStorage.Model
 {
     public class TaskModel
     {
@@ -41,5 +35,6 @@ namespace LocalStorage.Model
         /// </value>
         public string Name { get; set; }
 
+        public int? ToDoId { get; set; }
     }
 }

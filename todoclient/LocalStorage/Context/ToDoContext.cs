@@ -2,15 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LocalStorage.Context
 {
-    public class DbContext : System.Data.Entity.DbContext
+    public class ToDoContext : DbContext
     {
-        public DbContext() : base("DbConnection")
+        public ToDoContext() : base("DbConnection")
         {
             this.Configuration.ProxyCreationEnabled = false;
         }

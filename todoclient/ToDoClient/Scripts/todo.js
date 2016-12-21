@@ -4,11 +4,15 @@
     // @parentSelector: selector to append a row to.
     // @obj: task object to append.
     var appendRow = function(parentSelector, obj) {
-        var tr = $("<tr data-id='" + obj.ToDoId + "'></tr>");
+        var tr = $("<tr data-id='" + obj.ToDoId + "' id='todo-tr-" + obj.ToDoId  + "'></tr>");
         tr.append("<td><input type='checkbox' class='completed' " + (obj.IsCompleted ? "checked" : "") + "/></td>");
         tr.append("<td class='name' >" + obj.Name + "</td>");
         tr.append("<td><input type='button' class='delete-button' value='Delete' /></td>");
         $(parentSelector).append(tr);
+    }
+
+    var deleteRow = function(id) {
+        $("#todo-tr-" + id).remove();
     }
 
     // adds all tasks as rows (deletes all rows before).
@@ -74,7 +78,9 @@
         displayTasks: displayTasks,
         createTask: createTask,
         deleteTask: deleteTask,
-        updateTask: updateTask
+        updateTask: updateTask,
+        deleteRow: deleteRow,
+        appendRow: appendRow
     };
 }();
 
@@ -86,10 +92,13 @@ $(function () {
         var name = $('#newName')[0].value;
 
         tasksManager.createTask(isCompleted, name)
-            .then(tasksManager.loadTasks)
-            .done(function(tasks) {
-                tasksManager.displayTasks("#tasks > tbody", tasks);
+            .then(function(todoObj) {
+                tasksManager.appendRow("#tasks > tbody", todoObj);
             });
+        //.then(tasksManager.loadTasks)
+        //.done(function(tasks) {
+        //    tasksManager.displayTasks("#tasks > tbody", tasks);
+        //});
     });
 
     // bind update task checkbox click handler
@@ -100,20 +109,23 @@ $(function () {
         var name = tr.find('.name').text();
         
         tasksManager.updateTask(taskId, isCompleted, name)
-            .then(tasksManager.loadTasks)
-            .done(function (tasks) {
-                tasksManager.displayTasks("#tasks > tbody", tasks);
-            });
+            //.then(tasksManager.loadTasks)
+            //.done(function (tasks) {
+            //    tasksManager.displayTasks("#tasks > tbody", tasks);
+            //});
     });
 
     // bind delete button click for future rows
-    $('#tasks > tbody').on('click', '.delete-button', function() {
+    $('#tasks > tbody').on('click', '.delete-button', function () {//delete-button
         var taskId = $(this).parent().parent().attr("data-id");
         tasksManager.deleteTask(taskId)
-            .then(tasksManager.loadTasks)
-            .done(function(tasks) {
-                tasksManager.displayTasks("#tasks > tbody", tasks);
+            .then(function() {
+                tasksManager.deleteRow(taskId);
             });
+        //.then(tasksManager.loadTasks)
+        //.done(function(tasks) {
+        //    tasksManager.displayTasks("#tasks > tbody", tasks);   
+        //});
     });
 
     // load all tasks on startup

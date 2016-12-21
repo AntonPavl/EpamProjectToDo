@@ -6,7 +6,6 @@ using System.Linq;
 using System.Web.Http;
 using todoclient.Mappers;
 using ToDoClient.Models;
-using ToDoClient.Services;
 
 namespace ToDoClient.Controllers
 {
@@ -15,22 +14,19 @@ namespace ToDoClient.Controllers
     /// </summary>
     public class ToDosController : ApiController
     {
-        private readonly ToDoService todoService = new ToDoService();
-        private readonly UserService userService = new UserService();
+        //private readonly ToDoService todoService = new ToDoService();
+        //private readonly UserService userService = new UserService();
         private readonly DataService dataService = new DataService();
-        //Anton!!
-        //asdads
+
         /// <summary>
         /// Returns all todo-items for the current user.
         /// </summary>
         /// <returns>The list of todo-items.</returns>
         public IList<ToDoItemViewModel> Get() //Work
         {
-            var userId = dataService.GetOrCreateUser();
+            var userId = dataService.UserService.GetOrCreateUser();
             return dataService.GetItems(userId).Select(x => x.TaskModel_To_ToDoViewModel()).ToList();
         }
-
-
 
         /// <summary>
         /// Updates the existing todo-item.
@@ -40,7 +36,7 @@ namespace ToDoClient.Controllers
         {
             //todo.UserId = userService.GetOrCreateUser(); 
             //todoService.UpdateItem(todo); 
-            todo.UserId = dataService.GetOrCreateUser();
+            todo.UserId = dataService.UserService.GetOrCreateUser();
             dataService.UpdateItem(todo.ToDoViewModel_To_TaskModel());
         }
 
@@ -50,8 +46,8 @@ namespace ToDoClient.Controllers
         /// <param name="id">The todo item identifier.</param>
         public void Delete(int id)
         {
-            // todoService.DeleteItem(id); 
-            dataService.DeleteItem(id);
+            var userId = dataService.UserService.GetOrCreateUser();
+            dataService.DeleteItem(id, userId);
         }
 
 
@@ -60,10 +56,13 @@ namespace ToDoClient.Controllers
         /// Creates a new todo-item.
         /// </summary>
         /// <param name="todo">The todo-item to create.</param>
-        public void Post(ToDoItemViewModel todo) //Work
+        public IHttpActionResult Post(ToDoItemViewModel todo)
         {
-            todo.UserId = dataService.GetOrCreateUser();
-            dataService.CreateItem(todo.ToDoViewModel_To_TaskModel());
+            var userId = dataService.UserService.GetOrCreateUser();
+            var task = todo.ToDoViewModel_To_TaskModel();
+            var item = dataService.CreateItem(task, userId);
+
+            return Json(item.TaskModel_To_ToDoViewModel());
         }
     }
 }
