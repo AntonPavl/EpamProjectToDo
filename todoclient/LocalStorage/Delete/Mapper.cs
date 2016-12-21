@@ -17,24 +17,21 @@ namespace LocalStorage.Delete
                 IsCompleted = tm.IsCompleted,
                 Name = tm.Name,
                 ToDoId = tm.Id,
-                UserId = tm.User.Id,
+                UserId = tm.UserId,
                 RealId = tm.RealId
             };
         }
 
         public static TaskModel ToDoViewModel_To_TaskModel(this ToDoItemViewModel tm)
         {
-            using (var db = new DbContext())
+            return new TaskModel()
             {
-                return new TaskModel()
-                {
-                    IsCompleted = tm.IsCompleted,
-                    Name = tm.Name,
-                    Id = tm.ToDoId,
-                    User = db.Users.FirstOrDefault(x => x.Id == tm.UserId),
-                    RealId = tm.RealId
-                };
-            }
+                IsCompleted = tm.IsCompleted,
+                Name = tm.Name,
+                Id = tm.ToDoId,
+                UserId = tm.UserId,
+                RealId = tm.RealId
+            };
         }
     }
 }

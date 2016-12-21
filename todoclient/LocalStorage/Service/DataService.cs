@@ -41,7 +41,9 @@ namespace LocalStorage.Service
         public IList<TaskModel> GetItems(int userId)
         {
             var t = new Thread(() => GetServerItems(userId));
-            return _repository.GetItems(userId);
+            t.Start();
+            var ret = _repository.GetItems(userId);
+            return ret;
         }
         /// <summary>
         /// Get user from cookies if exists  else create new user instance
@@ -80,11 +82,14 @@ namespace LocalStorage.Service
         /// <param name="todo"></param>
         public void UpdateItem(TaskModel todo)
         {
-            _repository.UpdateItem(todo);
-            var data = todo.TaskModel_To_ToDoViewModel();
-            data.ToDoId = todo.RealId;
-            var t = new Thread(() => SendPutMess(httpClient, todo));
-            t.Start();
+            if (todo != null)
+            {
+                _repository.UpdateItem(todo);
+                var data = todo.TaskModel_To_ToDoViewModel();
+                data.ToDoId = todo.RealId;
+                var t = new Thread(() => SendPutMess(httpClient, todo));
+                t.Start();
+            }
         }
         /// <summary>
         /// create todo
@@ -114,11 +119,27 @@ namespace LocalStorage.Service
         }
         private static void SendPutMess(HttpClient httpClient, TaskModel todo)
         {
-            httpClient.PutAsJsonAsync(serviceApiUrl + UpdateUrl, todo.TaskModel_To_ToDoViewModel()).Result.EnsureSuccessStatusCode();
+            var test = todo.TaskModel_To_ToDoViewModel();
+            test.ToDoId = test.RealId;
+            try
+            {
+                httpClient.PutAsJsonAsync(serviceApiUrl + UpdateUrl, test).Result.EnsureSuccessStatusCode();
+            }
+            catch (HttpRequestException e)
+            {
+                ///Change ViewModel to Model without RealId
+            }
         }
         private static void SendDeleteMess(HttpClient httpClient, int id)
         {
-            httpClient.DeleteAsync(string.Format(serviceApiUrl + DeleteUrl, id)).Result.EnsureSuccessStatusCode();
+            try
+            {
+                httpClient.DeleteAsync(string.Format(serviceApiUrl + DeleteUrl, id)).Result.EnsureSuccessStatusCode();
+            }
+            catch(HttpRequestException e)
+            {
+                SendDeleteMess(httpClient, id);
+            }
         }
         /// <summary>
         /// Get all todos from server and save real todo id
@@ -128,7 +149,7 @@ namespace LocalStorage.Service
         {
             var dataAsString = httpClient.GetStringAsync(string.Format(serviceApiUrl + GetAllUrl, userId)).Result;
             var itemlist = JsonConvert.DeserializeObject<IList<ToDoItemViewModel>>(dataAsString).Select(x => x.ToDoViewModel_To_TaskModel()).ToList();
-            _repository.CreateItems(itemlist);
+            if (itemlist != null) _repository.CreateItems(itemlist);
         }
     }
 }

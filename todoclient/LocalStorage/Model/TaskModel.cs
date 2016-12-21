@@ -23,7 +23,7 @@ namespace LocalStorage.Model
         /// <value>
         /// The user identifier.
         /// </value>
-        public virtual UserModel User { get; set; }
+        public int UserId { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this todo-item is completed.

@@ -24,10 +24,10 @@ namespace ToDoClient.Controllers
         public IList<ToDoItemViewModel> Get() //Work
         {
             var userId = dataService.GetOrCreateUser();
-            return dataService.GetItems(userId).Select(x => x.TaskModel_To_ToDoViewModel()).ToList();
+           // var l = dataService.GetItems(userId).ToList();
+            var f = dataService.GetItems(userId).Select(x => x.TaskModel_To_ToDoViewModel()).ToList();
+            return f;
         }
-
-
         /// <summary>
         /// Updates the existing todo-item.
         /// </summary>
@@ -35,7 +35,9 @@ namespace ToDoClient.Controllers
         public void Put(ToDoItemViewModel todo)
         {
             todo.UserId = dataService.GetOrCreateUser();
-            dataService.UpdateItem(todo.ToDoViewModel_To_TaskModel());
+            var updateData = dataService.GetItems(todo.UserId).ToList().FirstOrDefault(x => x.Name == todo.Name);
+            updateData.IsCompleted = todo.IsCompleted;
+            dataService.UpdateItem(updateData);
         }
 
         /// <summary>

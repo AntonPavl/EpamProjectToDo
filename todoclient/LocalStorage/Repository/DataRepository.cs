@@ -42,7 +42,7 @@ namespace LocalStorage.Repository
         {
             using (var db = new DbContext())
             {
-                var tasks = db.Tasks.Where(x => x.User.Id == userId);
+                var tasks = db.Tasks.Where(x => x.UserId == userId);
                 return tasks.ToList() ;
             }
         }
@@ -60,7 +60,7 @@ namespace LocalStorage.Repository
 
                     item.IsCompleted = todo.IsCompleted;
                     item.Name = todo.Name;
-                    item.User = db.Users.FirstOrDefault(x=>x.Id == todo.User.Id);
+                    item.UserId = db.Users.FirstOrDefault(x=>x.Id == todo.UserId).Id;
                     db.SaveChanges();
                 }
             }
@@ -75,12 +75,14 @@ namespace LocalStorage.Repository
             TaskModel ret;
             using (var db = new DbContext())
             {
-                var f = db.Users.FirstOrDefault(x => x.Id == todo.User.Id);
+                var f = db.Users.FirstOrDefault(x => x.Id == todo.UserId);
                 var model = new TaskModel()
                 {
                     Id = todo.Id,
                     IsCompleted = todo.IsCompleted,
-                    Name = todo.Name
+                    Name = todo.Name,
+                    UserId = todo.UserId
+
                 };
                 f.TaskList.Add(model);
                 ret = model;
@@ -113,13 +115,14 @@ namespace LocalStorage.Repository
             {
                 using (var db = new DbContext())
                 {
-                    var f = db.Users.FirstOrDefault(x => x.Id == list[0].User.Id);
+                    var index = 1; //test
+                    var f = db.Users.FirstOrDefault(x => x.Id == index);
                     foreach (var item in list)
                     {
-                        if (db.Tasks.Contains(item))
+                        var task = db.Tasks.FirstOrDefault(x => x.Name == item.Name);
+                        if (task != null)
                         {
-                            var task = db.Tasks.FirstOrDefault(x => x.Name == item.Name);
-                            task.RealId = item.RealId;
+                            task.RealId = item.Id;
                         }
                         else
                         {
@@ -127,7 +130,8 @@ namespace LocalStorage.Repository
                             {
                                 RealId = item.Id,
                                 IsCompleted = item.IsCompleted,
-                                Name = item.Name
+                                Name = item.Name,
+                                UserId = item.UserId
                             };
                             f.TaskList.Add(model);
                         }

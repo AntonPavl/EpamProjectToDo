@@ -17,7 +17,7 @@ namespace todoclient.Mappers
                 IsCompleted = tm.IsCompleted,
                 Name = tm.Name,
                 ToDoId = tm.Id,
-                UserId = tm.User.Id,
+                UserId = tm.UserId,
                 RealId = tm.RealId
             };
         }
@@ -31,8 +31,8 @@ namespace todoclient.Mappers
                     IsCompleted = tm.IsCompleted,
                     Name = tm.Name,
                     Id = tm.ToDoId,
-                    User = db.Users.FirstOrDefault(x => x.Id == tm.UserId),
-                    RealId = tm.RealId
+                    UserId = db.Users.FirstOrDefault(x => x.Id == tm.UserId).Id,
+                    RealId = tm.ToDoId
                 };
             }
         }
